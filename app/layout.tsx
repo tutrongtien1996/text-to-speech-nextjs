@@ -1,19 +1,14 @@
-import Head from 'next/head'
 import type { Metadata } from 'next'
-import type {
-  Author,
-  IconURL,
-} from 'next/dist/lib/metadata/types/metadata-types'
-import { Inter } from 'next/font/google'
+import type { Author } from 'next/dist/lib/metadata/types/metadata-types'
 
 import './globals.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
+import LeftMenuSideBar from './components/LeftMenuSideBar'
+import NotFoundPage from './NotFoundPage'
 
-const inter = Inter({ subsets: ['latin'] })
 const author: Author = {
   name: 'Tien.TT',
 }
-const iconApp: IconURL = '/public/logo_icon.png'
 export const metadata: Metadata = {
   title: 'Text2Speech: Chuyển Đổi Văn Bản thành Giọng Nói',
   description:
@@ -27,5 +22,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  return <html lang="en">{children}</html>
+  return (
+    <html lang="en">
+      <body>
+        <div className="d-flex justify-content-center vw-100  contai_body">
+          <LeftMenuSideBar />
+          {children}
+        </div>
+      </body>
+    </html>
+  )
 }

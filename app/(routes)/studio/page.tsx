@@ -14,9 +14,14 @@ const StudioPage = () => {
             Tải file .txt
           </label>
         </div>
-        {/* <div>
-          <button type="button" className="btn btn-outline-info btn-lg btn_use_ai">Sử Dụng AI</button>
-        </div> */}
+        <div>
+          <button
+            type="button"
+            className="btn btn-outline-info btn-lg btn_use_ai"
+          >
+            Sử Dụng AI
+          </button>
+        </div>
       </div>
       <div className="mt-2 rounded-2 p-3 bg-light">
         <div className="border-bottom pb-2">

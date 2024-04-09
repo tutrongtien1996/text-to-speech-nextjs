@@ -7,8 +7,11 @@ import userIcon from '/public/assets/images/menuLeft/user.svg'
 import questionIcon from '/public/assets/images/menuLeft/question.svg'
 import ItemMenu from './helper/ItemMenu'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { memo } from 'react'
 
 const LeftMenuSideBar = () => {
+  const pathName = usePathname()
   return (
     <div className=" contai_nav p-3">
       <div className="d-flex justify-content-between border-bottom">
@@ -23,26 +26,47 @@ const LeftMenuSideBar = () => {
       <div className="contai_content_list mt-3">
         <ul className="list-unstyled">
           <Link href="/studio">
-            <ItemMenu icon={studioIcon} title="Studio" isActive={true} />
+            <ItemMenu
+              icon={studioIcon}
+              title="Studio"
+              isActive={pathName.includes('/studio')}
+            />
           </Link>
           <Link href="/conversations">
-            <ItemMenu icon={conversationIcon} title="Conversation" />
+            <ItemMenu
+              icon={conversationIcon}
+              title="Conversation"
+              isActive={pathName.includes('/conversations')}
+            />
           </Link>
           <Link href="#">
-            <ItemMenu icon={cartIcon} title="Mua gói cước" />
+            <ItemMenu
+              icon={cartIcon}
+              title="Mua gói cước"
+              isActive={pathName.includes('/products')}
+            />
           </Link>
           <Link href="#">
-            <ItemMenu icon={questionIcon} title="Câu hỏi thường gặp" />
+            <ItemMenu
+              icon={questionIcon}
+              title="Câu hỏi thường gặp"
+              isActive={pathName.includes('/faqs')}
+            />
           </Link>
           <Link href="#">
             <ItemMenu
               icon="/assets/images/facebook.png"
               title="Liên hệ facebook"
+              isActive={pathName.includes('/contact')}
             />
           </Link>
           <li className="border-bottom"></li>
           <Link href="#">
-            <ItemMenu icon={userIcon} title="User name" />
+            <ItemMenu
+              icon={userIcon}
+              title="User name"
+              isActive={pathName.includes('/user')}
+            />
           </Link>
         </ul>
       </div>
@@ -50,4 +74,4 @@ const LeftMenuSideBar = () => {
   )
 }
 
-export default LeftMenuSideBar
+export default memo(LeftMenuSideBar)
