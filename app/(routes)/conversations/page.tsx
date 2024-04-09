@@ -50,14 +50,14 @@ const ConversationForm = () => {
         }),
       }
 
-      const response = await axios.post('/api/convert/conversation', formData, {
-        headers: {
-          'Content-Type': 'application/json',
-          Cookie: document.cookie,
-        },
-      })
+      //   const response = await axios.post('/api/convert/conversation', formData, {
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //       Cookie: document.cookie,
+      //     },
+      //   })
 
-      setMp3URL(response.data.data)
+      //   setMp3URL(response.data.data)
       showAudioSection()
     } catch (error) {
       console.error('Error:', error)
@@ -67,7 +67,7 @@ const ConversationForm = () => {
   const showAudioSection = () => {
     const audioWrapper = document.getElementById('audioWrapper')
     const audioPlayer = document.getElementById('audioPlayer')
-    if (audioPlayer) audioPlayer.src = mp3URL
+    // if (audioPlayer) audioPlayer.src = mp3URL
     if (audioWrapper) audioWrapper.style.display = 'block'
   }
 
