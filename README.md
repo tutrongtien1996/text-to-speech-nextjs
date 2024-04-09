@@ -1,10 +1,8 @@
-
-
 ## Getting Started
 
 Setup app:
 
-*run:* **npm install**
+_run:_ **npm install**
 
 First, run the development server:
 
@@ -14,3 +12,4 @@ First, run the development server:
 *yarn dev*
 ```
 
+![studio](/public/assets/images/readme.png)
