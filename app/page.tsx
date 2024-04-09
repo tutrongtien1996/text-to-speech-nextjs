@@ -1,13 +1,13 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import LeftMenuSideBar from './components/LeftMenuSideBar'
+'use client'
+
+import { useRouter } from 'next/navigation'
 import StudioPage from './(routes)/studio/page'
+import { useEffect } from 'react'
 
 export default function Home() {
-  return (
-    <div className="d-flex justify-content-center vw-100  contai_body">
-      <LeftMenuSideBar />
-      <StudioPage />
-    </div>
-  )
+  const router = useRouter()
+  useEffect(() => {
+    router.push('/studio')
+  }, [])
+  return <StudioPage />
 }
