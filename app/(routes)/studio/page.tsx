@@ -1,4 +1,12 @@
+'use client'
+
+import { TextToSpeechService } from '@/controllers/textToSpeechService'
+import { useEffect } from 'react'
+
 const StudioPage = () => {
+  useEffect(() => {
+    TextToSpeechService.create()
+  }, [])
   return (
     <div id="content_wrapper" className="contai_content p-2 position-relative">
       <div className="icon_bar d-none">
