@@ -1,0 +1,13 @@
+@import url(../_variables.css);
+.btn_toggle_voives {
+  color: var(--blue-color) !important;
+  background-color: unset !important;
+  border: none !important;
+  padding: unset !important;
+  display: flex !important;
+  align-items: center !important;
+}
+.volum_speed {
+  max-height: 25px;
+  border-left: 1px solid rgb(39, 39, 39);
+}
