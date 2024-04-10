@@ -1,12 +1,39 @@
 'use client'
+import { useEffect, useRef, useState } from 'react'
 
 import { TextToSpeechService } from '@/controllers/textToSpeechService'
-import { useEffect } from 'react'
+import { languageVoice, listVoices } from '@/controllers/constant'
+import ListVoices from './ListVoices'
+import TextForm from './TextForm'
+import { createContentToSpeech } from '@/controllers/config'
 
 const StudioPage = () => {
-  useEffect(() => {
-    TextToSpeechService.create()
-  }, [])
+  const audioRef = useRef<HTMLAudioElement>(null);
+  useEffect(() => {}, [])
+  const [text, setText] = useState('');
+  const [title, setTitle] = useState('');
+  const [checkedId, setCheckedId] = useState(0)
+  const handleCheckedId = (input: number) => {
+    setCheckedId(input)
+  }
+  const handleChangeText = (input: string) => {
+    setText(input)
+  }
+  const handleSubmitText = async () => {
+    const data = createContentToSpeech(
+      text,
+      listVoices[checkedId].id,
+      languageVoice.en
+    )
+    const response = await TextToSpeechService.create(data);
+    if (audioRef.current) {
+      audioRef.current.src = response.data.file;
+      audioRef.current.play();
+    }
+  }
+  const handleChangeTitle = (value: string) => {
+    setTitle(value)
+  }
   return (
     <div id="content_wrapper" className="contai_content p-2 position-relative">
       <div className="icon_bar d-none">
@@ -34,6 +61,8 @@ const StudioPage = () => {
       <div className="mt-2 rounded-2 p-3 bg-light">
         <div className="border-bottom pb-2">
           <input
+            onChange={(e) => handleChangeTitle(e.target.value)}
+            value={title}
             className="px-3 py-2 w-100"
             type="text"
             id="title"
@@ -42,31 +71,9 @@ const StudioPage = () => {
           />
         </div>
         <div className="border-bottom d-flex pt-2 pb-3 px-3 edit_voices">
-          <div className="px-2 categories_voices_container">
-            <ul
-              className="categories_voices"
-              style={{ marginBottom: '0px', paddingLeft: '0px' }}
-            ></ul>
-          </div>
-          <div
-            className="px-2"
-            style={{
-              maxHeight: '25px',
-              marginLeft: '150px',
-              borderLeft: '1px solid rgb(39, 39, 39)',
-            }}
-          >
-            Âm lượng
-          </div>
-          <div
-            className="px-2"
-            style={{
-              maxHeight: '25px',
-              borderLeft: '1px solid rgb(39, 39, 39)',
-            }}
-          >
-            Tốc độ
-          </div>
+          <ListVoices checkedId={checkedId} onCheckedId={handleCheckedId} />
+          <div className="px-2 volum_speed">Âm lượng</div>
+          <div className="px-2 volum_speed">Tốc độ</div>
         </div>
         <div className="border-bottom pb-2 pt-2 text_input d-none contai_ai">
           <div className="mb-2 d-flex justify-content-between">
@@ -97,22 +104,14 @@ const StudioPage = () => {
               </div>
             </div>
           </div>
-          <textarea
-            id="text-prompt"
-            className="w-100 shadow-none p-2"
-            placeholder="Nhập văn bản tại đây..."
+          <TextForm
             rows={4}
-            style={{ outline: 'none', border: 'none' }}
-          ></textarea>
+            id="text-prompt"
+            onChange={() => console.log('')}
+          />
         </div>
         <div className="border-bottom pb-2 pt-2 text_input">
-          <textarea
-            className="w-100 shadow-none p-2"
-            id="text"
-            placeholder="Nhập văn bản tại đây..."
-            rows={13}
-            style={{ outline: 'none', border: 'none' }}
-          ></textarea>
+          <TextForm rows={13} id="text" onChange={handleChangeText} />
         </div>
         <div className="p-2">
           <span>Bôi đen để nghe thử</span>
@@ -144,6 +143,7 @@ const StudioPage = () => {
                   type="button"
                   className="btn btn-info text-white"
                   id="convert"
+                  onClick={() => handleSubmitText()}
                 >
                   Chuyển đổi
                 </button>
@@ -154,7 +154,7 @@ const StudioPage = () => {
       </div>
       <div className="px-2 pt-3">
         <div className="contai_audio">
-          <audio className="w-100" controls={true}>
+          <audio ref={audioRef} className="w-100" controls={true}>
             <source src="#" type="audio/mp3" />
           </audio>
         </div>

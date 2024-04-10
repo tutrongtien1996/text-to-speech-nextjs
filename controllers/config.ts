@@ -73,3 +73,14 @@ export interface contentToSpeech {
   voiceId: string
   languageCode: string
 }
+export function createContentToSpeech(
+  text: string,
+  voiceId: string,
+  languageCode: string
+): contentToSpeech {
+  return {
+    text: text,
+    voiceId: voiceId,
+    languageCode: languageCode,
+  }
+}
