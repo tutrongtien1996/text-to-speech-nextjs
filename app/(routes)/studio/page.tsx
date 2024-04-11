@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 
+import { checkDatabaseConnection } from '@/lib/dbHelper';
 import { TextToSpeechService } from '@/controllers/textToSpeechService'
 import { languageVoice, listVoices } from '@/controllers/constant'
 import ListVoices from './ListVoices'
@@ -9,7 +10,9 @@ import { createContentToSpeech } from '@/controllers/config'
 
 const StudioPage = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
-  useEffect(() => {}, [])
+  useEffect(() => {
+     fetch('/api/checkDatabase')
+  } ,[])
   const [text, setText] = useState('');
   const [title, setTitle] = useState('');
   const [checkedId, setCheckedId] = useState(0)
