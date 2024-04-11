@@ -1,32 +1,41 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios'
-import { API_URL_TEXT } from './constant'
+import { API_URL_SERVER, API_URL_TEXT } from './constant'
+
 interface APIResponse {}
 
-const apiClient: AxiosInstance = axios.create({
-  baseURL: API_URL_TEXT,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
+const createAxiosInstance = (baseURL: string): AxiosInstance => {
+  const instance = axios.create({
+    baseURL: baseURL,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
 
-apiClient.interceptors.response.use(
-  function (response) {
-    return (
-      response.data ? response.data : response
-    ) as AxiosResponse<APIResponse>
-  },
-  function (error) {
-    return Promise.reject(error)
-  }
-)
+  instance.interceptors.response.use(
+    function (response) {
+      return response
+    },
+    function (error) {
+      return Promise.reject(error)
+    }
+  )
 
-const setAuthorization = (token: string): void => {
-  apiClient.defaults.headers.common['Authorization'] = 'Bearer ' + token
+  return instance
 }
 
 class APIClient {
+  private axiosInstance: AxiosInstance
+
+  constructor(baseURL: string) {
+    this.axiosInstance = createAxiosInstance(baseURL)
+  }
+
+  getAxiosInstance(): AxiosInstance {
+    return this.axiosInstance
+  }
+
   get = (url: string, params?: any): Promise<AxiosResponse<APIResponse>> => {
-    return apiClient.get(url, { params })
+    return this.axiosInstance.get(url, { params })
   }
 
   create = (
@@ -35,29 +44,35 @@ class APIClient {
     options?: any
   ): Promise<AxiosResponse<APIResponse>> => {
     if (options !== undefined) {
-      return apiClient.post(url, data, options)
+      return this.axiosInstance.post(url, data, options)
     }
-    return apiClient.post(url, data)
+    return this.axiosInstance.post(url, data)
   }
 
   update = async (
     url: string,
     data: any
   ): Promise<AxiosResponse<APIResponse>> => {
-    const result = await apiClient.put(url, data)
+    const result = await this.axiosInstance.put(url, data)
     return result
   }
 
-  deletePut = (url: string): Promise<AxiosResponse<APIResponse>> => {
-    return apiClient.put(url)
-  }
-
   delete = (url: string): Promise<AxiosResponse<APIResponse>> => {
-    return apiClient.delete(url)
+    return this.axiosInstance.delete(url)
   }
 }
 
-export { APIClient, setAuthorization }
+const apiClient = new APIClient(API_URL_TEXT)
+const apiServer = new APIClient(API_URL_SERVER)
+
+const setAuthorization = (token: string): void => {
+  apiClient.getAxiosInstance().defaults.headers.common['Authorization'] =
+    'Bearer ' + token
+  apiServer.getAxiosInstance().defaults.headers.common['Authorization'] =
+    'Bearer ' + token
+}
+
+export { APIClient, apiClient, apiServer, setAuthorization }
 
 export function getAccessToken() {
   let strUser = localStorage.getItem('authUser')
@@ -73,6 +88,7 @@ export interface contentToSpeech {
   voiceId: string
   languageCode: string
 }
+
 export function createContentToSpeech(
   text: string,
   voiceId: string,

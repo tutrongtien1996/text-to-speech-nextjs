@@ -29,35 +29,35 @@ const LeftMenuSideBar = () => {
             <ItemMenu
               icon={studioIcon}
               title="Studio"
-              isActive={pathName.includes('/studio')}
+              isActive={pathName && pathName.includes('/studio')}
             />
           </Link>
           <Link href="/conversations">
             <ItemMenu
               icon={conversationIcon}
               title="Conversation"
-              isActive={pathName.includes('/conversations')}
+              isActive={pathName && pathName.includes('/conversations')}
             />
           </Link>
           <Link href="#">
             <ItemMenu
               icon={cartIcon}
               title="Mua gói cước"
-              isActive={pathName.includes('/products')}
+              isActive={pathName && pathName.includes('/products')}
             />
           </Link>
           <Link href="#">
             <ItemMenu
               icon={questionIcon}
               title="Câu hỏi thường gặp"
-              isActive={pathName.includes('/faqs')}
+              isActive={pathName && pathName.includes('/faqs')}
             />
           </Link>
           <Link href="#">
             <ItemMenu
               icon="/assets/images/facebook.png"
               title="Liên hệ facebook"
-              isActive={pathName.includes('/contact')}
+              isActive={pathName && pathName.includes('/contact')}
             />
           </Link>
           <li className="border-bottom"></li>
@@ -65,7 +65,7 @@ const LeftMenuSideBar = () => {
             <ItemMenu
               icon={userIcon}
               title="User name"
-              isActive={pathName.includes('/user')}
+              isActive={pathName && pathName.includes('/user')}
             />
           </Link>
         </ul>

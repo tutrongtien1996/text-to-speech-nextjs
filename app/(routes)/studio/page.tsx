@@ -1,20 +1,24 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useReducer, useRef, useState } from 'react'
+import { useStoreProduct } from '@/store/products'
 
-import { checkDatabaseConnection } from '@/lib/dbHelper';
 import { TextToSpeechService } from '@/controllers/textToSpeechService'
 import { languageVoice, listVoices } from '@/controllers/constant'
 import ListVoices from './ListVoices'
 import TextForm from './TextForm'
 import { createContentToSpeech } from '@/controllers/config'
+import { getListProducts } from '@/store/products/actions'
+import productReducer from '@/store/products/reducer'
 
 const StudioPage = () => {
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const [state, disPatch] = useStoreProduct()
+  const [state2, disPatch2] = useReducer(productReducer, { products: [] })
+  const audioRef = useRef<HTMLAudioElement>(null)
   useEffect(() => {
-     fetch('/api/checkDatabase')
-  } ,[])
-  const [text, setText] = useState('');
-  const [title, setTitle] = useState('');
+    disPatch2(getListProducts({ data: { user_id: 1234 }, disPatch }))
+  }, [])
+  const [text, setText] = useState('')
+  const [title, setTitle] = useState('')
   const [checkedId, setCheckedId] = useState(0)
   const handleCheckedId = (input: number) => {
     setCheckedId(input)
@@ -28,10 +32,10 @@ const StudioPage = () => {
       listVoices[checkedId].id,
       languageVoice.en
     )
-    const response = await TextToSpeechService.create(data);
+    const response = await TextToSpeechService.create(data)
     if (audioRef.current) {
-      audioRef.current.src = response.data.file;
-      audioRef.current.play();
+      audioRef.current.src = response.data.file
+      audioRef.current.play()
     }
   }
   const handleChangeTitle = (value: string) => {

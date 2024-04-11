@@ -1,13 +1,27 @@
-// lib/dbHelper.ts
-import {db}  from './db';
+export interface ResultProduct {
+  id: number
+  user_id: number
+  title: string
+  content: string
+  voice_id: string
+  url_audio?: string | null
+  filename?: string
+  number_chars: number
+  speed: number
+  volumn: number
+  created_at?: Date
+}
 
-export async function checkDatabaseConnection() {
-  try {
-    const response = await db.select('id').from('voices');
-    console.log(response)
-    console.log('Database connection successful');
-  } catch (error) {
-    console.error('Failed to connect to database');
-    console.error(error);
-  }
+export interface InputProduct {
+  id: number
+  user_id: number
+  title: string
+  content: string
+  voice_id: string
+  filename?: string
+  number_chars: number
+  speed: number
+  volumn: number
+  created_at?: Date | undefined
+  url_audio?: string | null
 }
