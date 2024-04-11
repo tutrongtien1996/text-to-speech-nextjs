@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useReducer, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useStoreProduct } from '@/store/products'
 
 import { TextToSpeechService } from '@/controllers/textToSpeechService'
@@ -7,15 +7,20 @@ import { languageVoice, listVoices } from '@/controllers/constant'
 import ListVoices from './ListVoices'
 import TextForm from './TextForm'
 import { createContentToSpeech } from '@/controllers/config'
-import { getListProducts } from '@/store/products/actions'
-import productReducer from '@/store/products/reducer'
+import { createProducts, getListProducts } from '@/store/products/actions'
+import { nanoid } from 'nanoid';
+import ListProducts from './components/ListProducts'
+import SearchProduct from './components/SearchProduct'
+import PlayAudio from './components/PlayAudio'
+import ModalContentProduct from './components/ModalProduct'
+import FooterAction from './components/FooterAction'
+import PromptAIComponent from './components/PromptAI'
 
 const StudioPage = () => {
-  const [state, disPatch] = useStoreProduct()
-  const [state2, disPatch2] = useReducer(productReducer, { products: [] })
-  const audioRef = useRef<HTMLAudioElement>(null)
+  const [state, disPatch] = useStoreProduct();
+  const {products} = state;
   useEffect(() => {
-    disPatch2(getListProducts({ data: { user_id: 1234 }, disPatch }))
+    disPatch(getListProducts({ data: { user_id: 1234 }, disPatch }))
   }, [])
   const [text, setText] = useState('')
   const [title, setTitle] = useState('')
@@ -26,16 +31,29 @@ const StudioPage = () => {
   const handleChangeText = (input: string) => {
     setText(input)
   }
+
   const handleSubmitText = async () => {
-    const data = createContentToSpeech(
+    const dataText = createContentToSpeech(
       text,
       listVoices[checkedId].id,
       languageVoice.en
     )
-    const response = await TextToSpeechService.create(data)
-    if (audioRef.current) {
-      audioRef.current.src = response.data.file
-      audioRef.current.play()
+    const response = await TextToSpeechService.create(dataText);
+    if(response?.data?.success){
+      const baseUrl = "https://blubberbeedev2.s3.ap-southeast-1.amazonaws.com/voices/";
+      const data = {
+        id: nanoid(),
+        user_id: 1234,
+        title: title || text.substring(0, 25),
+        content: text,
+        voice_id: listVoices[checkedId].id,
+        filename: response.data.data.file.replace(baseUrl, ""),
+        number_chars: 100,
+        speed: 1,
+        volumn: 100,
+        url_audio: response.data.data.file
+      }
+      disPatch(createProducts({ data: data, disPatch }))
     }
   }
   const handleChangeTitle = (value: string) => {
@@ -83,34 +101,7 @@ const StudioPage = () => {
           <div className="px-2 volum_speed">Tốc độ</div>
         </div>
         <div className="border-bottom pb-2 pt-2 text_input d-none contai_ai">
-          <div className="mb-2 d-flex justify-content-between">
-            <div className="text-info">Gửi yêu cầu cho AI</div>
-            <div className="d-flex">
-              <div className="loading loading_AI me-2 d-none">
-                <button>
-                  Đang xử lý...
-                  <svg>
-                    <rect x="1" y="1"></rect>
-                  </svg>
-                </button>
-              </div>
-              <div>
-                <button
-                  type="button"
-                  className="btn btn-outline-info"
-                  id="askAI"
-                >
-                  Gửi
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-outline-dark btn-sm hide_AI"
-                >
-                  X
-                </button>
-              </div>
-            </div>
-          </div>
+          <PromptAIComponent />
           <TextForm
             rows={4}
             id="text-prompt"
@@ -122,178 +113,26 @@ const StudioPage = () => {
         </div>
         <div className="p-2">
           <span>Bôi đen để nghe thử</span>
-          <div className="d-flex justify-content-between">
-            <div>
-              <button type="button" className="btn btn-outline-secondary">
-                Nghe thử
-              </button>
-            </div>
-            <div className="d-flex align-items-center">
-              <span>0/5000</span>
-            </div>
-            <div className="d-flex">
-              <div className="loading loading_convert me-2 d-none">
-                <button>
-                  Đang xử lý...
-                  <svg>
-                    <rect x="1" y="1"></rect>
-                  </svg>
-                </button>
-              </div>
-              <div className="success_convert d-none">
-                <button type="button" className="btn btn-outline-success">
-                  Đã xong!
-                </button>
-              </div>
-              <div>
-                <button
-                  type="button"
-                  className="btn btn-info text-white"
-                  id="convert"
-                  onClick={() => handleSubmitText()}
-                >
-                  Chuyển đổi
-                </button>
-              </div>
-            </div>
-          </div>
+          <FooterAction
+            handleSubmit={handleSubmitText}
+          />
         </div>
       </div>
       <div className="px-2 pt-3">
         <div className="contai_audio">
-          <audio ref={audioRef} className="w-100" controls={true}>
-            <source src="#" type="audio/mp3" />
-          </audio>
+          <PlayAudio />
         </div>
       </div>
-      <div className="row gx-0 mt-3 d-flex justify-content-end filter_check">
-        <div className="col p-1">
-          <div>
-            <input type="text" placeholder="Nhập tiêu đề" />
-          </div>
-        </div>
-        <div className="col p-1">
-          <div>
-            <input type="text" placeholder="trạng thái" />
-          </div>
-        </div>
-        <div className="col p-1">
-          <div>
-            <input type="text" placeholder="Bắc đầu" />
-          </div>
-        </div>
-        <div className="col p-1">
-          <div>
-            <input type="text" placeholder="Ngày kết thúc" />
-          </div>
-        </div>
-      </div>
+      <SearchProduct />
       <div id="table_product" className="mt-3 contai_table">
-        <table>
-          <thead>
-            <tr>
-              <th className="p-2 py-3">
-                <input type="checkbox" />
-              </th>
-              <th>
-                <div className="col_title">Tiêu đề</div>
-              </th>
-              <th>
-                <div className="col_chars">Ký tự</div>
-              </th>
-              <th>
-                <div className="col_date">Thời gian</div>
-              </th>
-              <th>
-                <div className="col_status">Trạng thái</div>
-              </th>
-              <th>
-                <div className="col_voices">Giọng đọc</div>
-              </th>
-              <th>
-                <div className="col_action">Thành công</div>
-              </th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <ListProducts
+          products = {products}
+         />
       </div>
-
-      {/* The Modal view detail */}
-      <div className="modal" id="myModal">
-        <div className="popup_view modal-dialog modal-xl modal-dialog-centered">
-          <div className="modal-content">
-            {/* Modal Header */}
-            <div className="modal-header contai_header position-relative">
-              <div className="close_popup">
-                <button
-                  type="button"
-                  className="btn-close shadow-none"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                ></button>
-              </div>
-            </div>
-
-            {/* Modal body */}
-            <div className="modal-body">
-              <div className="w-100 p-2 border top_popup text-center">
-                <h5 className="modal-title text-white">Thông tin</h5>
-              </div>
-              <div className="row p-2 border gx-0">
-                <div className="col">
-                  <ul>
-                    <li>
-                      <div className="d-flex">
-                        <p className="fw-bold me-3">ID:</p>
-                        <p className="view_id"></p>
-                      </div>
-                    </li>
-                    <li>
-                      <div className="d-flex">
-                        <p className="fw-bold me-3">Tiêu đề:</p>
-                        <p className="view_title"></p>
-                      </div>
-                    </li>
-                    <li>
-                      <div className="d-flex">
-                        <p className="fw-bold me-3">Số ký tự:</p>
-                        <p className="view_number_chars"></p>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-                <div className="col">
-                  <ul>
-                    <li>
-                      <div className="d-flex">
-                        <p className="fw-bold me-3">Giọng đọc: </p>
-                        <p className="view_voice_name"></p>
-                      </div>
-                    </li>
-                    <li>
-                      <div className="d-flex">
-                        <p className="fw-bold me-3">Tốc độ: </p>
-                        <p>1.0x</p>
-                      </div>
-                    </li>
-                    <li>
-                      <div className="d-flex">
-                        <p className="fw-bold me-3">Âm lượng: </p>
-                        <p>100%</p>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div className="border py-2 px-3">
-                <h6 className="fw-bold">Nội dung</h6>
-                <p className="view_content_text"></p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <ModalContentProduct
+        isOpen={false}
+        toggle={() => false}
+      />
     </div>
   )
 }

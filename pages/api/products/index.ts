@@ -10,7 +10,7 @@ export default async function handler(
   switch (req.method) {
     case 'GET': {
       try {
-        const response = await ProductModel.list(req.body.user_id)
+        const response = await ProductModel.list(req.query.user_id)
         return res.status(200).json(responseResult.success(response))
       } catch (err: any) {
         return res.status(500).json(responseResult.unsuccess(err.message))

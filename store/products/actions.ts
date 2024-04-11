@@ -25,7 +25,6 @@ export const getListProducts = (payload: any) => {
 }
 
 export const getListProductSuccess = (payload: any) => {
-  console.log('vao---------------')
   return {
     type: GET_LIST_PRODUCTS_SUCCESS,
     payload,
@@ -37,22 +36,19 @@ export const getListProductFail = (payload: any) => ({
   payload,
 })
 
-// export const createProducts = (payload: any) => {
-//   asyncAction(
-//     payload,
-//     ProductsAPI.create,
-//     (result) => {
-//       createProductSuccess(result)
-//     },
-//     (error) => {
-//       createProductFail(error)
-//     }
-//   )
-//   return {
-//     type: CREATE_PRODUCTS,
-//     payload,
-//   }
-// }
+export const createProducts = (payload: any) => {
+  asyncAction(
+    payload.data,
+    ProductsAPI.create,
+    payload.disPatch,
+    createProductSuccess,
+    createProductFail,
+  )
+  return {
+    type: CREATE_PRODUCTS,
+    payload,
+  }
+}
 
 export const createProductSuccess = (payload: any) => {
   return {

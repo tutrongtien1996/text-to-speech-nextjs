@@ -1,5 +1,5 @@
 'use client'
-import { ProductsProvider } from '@/store/products'
+import { ProductsProvider, useStoreProduct } from '@/store/products'
 
 export default function GeneralLayout({
   children,
