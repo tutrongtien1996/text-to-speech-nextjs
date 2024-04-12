@@ -17,4 +17,12 @@ export const ProductsAPI: any = {
       return false
     }
   },
+  delete: async (input: any) => {
+    try {
+      const response = await apiServer.delete(`/api/products?id=${input.id}`)
+      return response
+    } catch (err) {
+      return false
+    }
+  },
 }

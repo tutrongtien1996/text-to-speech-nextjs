@@ -5,6 +5,7 @@ import './globals.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import LeftMenuSideBar from './components/LeftMenuSideBar'
 import Head from 'next/head'
+import { ToastContainer } from 'react-toastify'
 
 const author: Author = {
   name: 'Tien.TT',
@@ -26,10 +27,10 @@ export default function RootLayout({
     <html lang="en">
       <Head>
         <link rel="shortcut icon" href="/favicon.ico" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
       </Head>
       <body>
         <div className="d-flex justify-content-center vw-100  contai_body">
+          <ToastContainer />
           <LeftMenuSideBar />
           {children}
         </div>

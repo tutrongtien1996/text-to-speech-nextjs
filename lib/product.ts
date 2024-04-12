@@ -14,9 +14,7 @@ const ProductModel = {
     }
   },
 
-  create: async (
-    input: InputProduct
-  ) => {
+  create: async (input: InputProduct) => {
     try {
       if (true) {
         let result = await db<ResultProduct>('text_details').insert({
@@ -44,9 +42,9 @@ const ProductModel = {
     }
   },
 
-  delete: async (input: { id: string | number }) => {
+  delete: async (input: { id: string | string[] }) => {
     try {
-      let results = await db('text_details').del().where('id', input.id)
+      await db('text_details').del().where('id', input.id)
       return true
     } catch {
       return false

@@ -4,6 +4,9 @@ import {
   CREATE_PRODUCTS,
   CREATE_PRODUCTS_FALSE,
   CREATE_PRODUCTS_SUCCESS,
+  DELETE_PRODUCT,
+  DELETE_PRODUCT_FALSE,
+  DELETE_PRODUCT_SUCCESS,
   GET_LIST_PRODUCTS,
   GET_LIST_PRODUCTS_FALSE,
   GET_LIST_PRODUCTS_SUCCESS,
@@ -42,7 +45,7 @@ export const createProducts = (payload: any) => {
     ProductsAPI.create,
     payload.disPatch,
     createProductSuccess,
-    createProductFail,
+    createProductFail
   )
   return {
     type: CREATE_PRODUCTS,
@@ -59,6 +62,33 @@ export const createProductSuccess = (payload: any) => {
 export const createProductFail = (payload: any) => {
   return {
     type: CREATE_PRODUCTS_FALSE,
+    payload,
+  }
+}
+
+export const deleteProduct = (payload: any) => {
+  asyncAction(
+    payload.data,
+    ProductsAPI.delete,
+    payload.disPatch,
+    deleteProductSuccess,
+    deleteProductFail
+  )
+  return {
+    type: DELETE_PRODUCT,
+    payload,
+  }
+}
+
+export const deleteProductSuccess = (payload: any) => {
+  return {
+    type: DELETE_PRODUCT_SUCCESS,
+    payload,
+  }
+}
+export const deleteProductFail = (payload: any) => {
+  return {
+    type: DELETE_PRODUCT_FALSE,
     payload,
   }
 }

@@ -24,6 +24,18 @@ export default async function handler(
         return res.status(500).json(responseResult.unsuccess(err.message))
       }
     }
+    case 'DELETE': {
+      if (req.query.id) {
+        try {
+          const response = await ProductModel.delete({ id: req.query.id })
+          return res.status(200).json(responseResult.success(req.query.id))
+        } catch (err: any) {
+          return res.status(500).json(responseResult.unsuccess(err.message))
+        }
+      } else {
+        return res.status(500).json(responseResult.unsuccess('khong co id'))
+      }
+    }
     default: {
       return
     }

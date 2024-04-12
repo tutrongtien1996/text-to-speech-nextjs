@@ -1,13 +1,11 @@
-'use client'
-import { useRef } from "react"
+import { forwardRef } from 'react'
 
-const PlayAudio = () => {
-    const audioRef = useRef<HTMLAudioElement>(null)
-    return (
-        <audio ref={audioRef} className="w-100" controls={true}>
-            <source src="#" type="audio/mp3" />
-        </audio>
-    )
-}
+const PlayAudio = forwardRef<HTMLAudioElement, {}>((props, ref) => {
+  return (
+    <audio ref={ref} className="w-100" controls={true}>
+      <source src="#" type="audio/mp3" />
+    </audio>
+  )
+})
 
 export default PlayAudio
