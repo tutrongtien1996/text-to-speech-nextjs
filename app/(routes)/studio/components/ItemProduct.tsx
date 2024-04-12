@@ -36,6 +36,7 @@ const ItemProduct = ({ data, handlePlayAudio, index }: ItemProductProps) => {
   }
   const handleDeleteProduct = () => {
     disPatch(deleteProduct({ data: { id: data.id, index: index }, disPatch }))
+    setIsOpenModalConfirm(false)
   }
   const toggleModalDelete = () => {
     setIsOpenModalConfirm((prev) => !prev)
@@ -60,7 +61,11 @@ const ItemProduct = ({ data, handlePlayAudio, index }: ItemProductProps) => {
             >
               Đồng ý
             </button>
-            <button type="button" className="btn btn-danger">
+            <button
+              type="button"
+              className="btn btn-danger"
+              onClick={() => setIsOpenModalConfirm(false)}
+            >
               Huỷ
             </button>
           </div>
