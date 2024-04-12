@@ -1,11 +1,9 @@
 import {
-  APIClient,
+  apiClient,
   contentToSpeech,
   getAccessToken,
   setAuthorization,
 } from './config'
-
-const apiClient = new APIClient()
 
 export const TextToSpeechService: any = {
   create: async (input: contentToSpeech) => {

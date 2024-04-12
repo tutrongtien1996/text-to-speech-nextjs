@@ -1,4 +1,7 @@
 @import url('../styles/app.css');
+@import url('../styles/pages/studio.css');
+@import '@fortawesome/fontawesome-svg-core/styles.css';
+@import 'react-toastify/dist/ReactToastify.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

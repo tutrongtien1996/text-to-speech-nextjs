@@ -1,39 +1,112 @@
 'use client'
+import { useEffect, useRef, useState } from 'react'
+import { useStoreProduct } from '@/store/products'
 
+import { toast } from 'react-toastify'
 import { TextToSpeechService } from '@/controllers/textToSpeechService'
-import { useEffect } from 'react'
+import { languageVoice, listVoices } from '@/controllers/constant'
+import ListVoices from './ListVoices'
+import TextForm from './TextForm'
+import { createContentToSpeech } from '@/controllers/config'
+import { createProducts, getListProducts } from '@/store/products/actions'
+import { nanoid } from 'nanoid'
+import ListProducts from './components/ListProducts'
+import SearchProduct from './components/SearchProduct'
+import PlayAudio from './components/PlayAudio'
+import FooterAction from './components/FooterAction'
+import PromptAIComponent from './components/PromptAI'
+import TopButtonComponent from './components/ButtonTopFileAI'
 
 const StudioPage = () => {
+  const [state, disPatch] = useStoreProduct()
+  const { products } = state
   useEffect(() => {
-    TextToSpeechService.create()
+    disPatch(getListProducts({ data: { user_id: 1234 }, disPatch }))
   }, [])
+  const [text, setText] = useState('')
+  const [title, setTitle] = useState('')
+  const [totalChar, setTotalChar] = useState(0)
+  const [checkedId, setCheckedId] = useState(0)
+  const [converting, setConverting] = useState(false)
+  const audioRef = useRef<HTMLAudioElement>(null)
+
+  const handlePlayAudio = (url: string) => {
+    if (audioRef.current && url) {
+      audioRef.current.src = url
+      audioRef.current.play()
+    }
+  }
+  const handleCheckedId = (input: number) => {
+    setCheckedId(input)
+  }
+  const handleChangeText = (input: string) => {
+    setText(input)
+  }
+  useEffect(() => {
+    setTotalChar(text.length)
+  }, [text])
+
+  const toastCreate = (input: boolean) => {
+    if (input) {
+      toast.success('Tạo thành công!', {
+        position: 'bottom-right',
+      })
+    } else {
+      toast.error('Không thành công!', {
+        position: 'bottom-right',
+      })
+    }
+  }
+
+  const handleSubmitText = async () => {
+    setConverting(true)
+    const dataText = createContentToSpeech(
+      text,
+      listVoices[checkedId].id,
+      languageVoice.en
+    )
+    const response = await TextToSpeechService.create(dataText)
+    setConverting(false)
+    if (response?.data?.success) {
+      const baseUrl =
+        'https://blubberbeedev2.s3.ap-southeast-1.amazonaws.com/voices/'
+      const data = {
+        id: nanoid(),
+        user_id: 1234,
+        title: title || text.substring(0, 25),
+        content: text,
+        voice_id: listVoices[checkedId].id,
+        filename: response.data.data.file.replace(baseUrl, ''),
+        number_chars: totalChar,
+        speed: 1,
+        volumn: 100,
+        url_audio: response.data.data.file,
+        cb: toastCreate,
+      }
+      disPatch(createProducts({ data: data, disPatch }))
+    }
+  }
+  const handleChangeTitle = (value: string) => {
+    setTitle(value)
+  }
+  useEffect(() => {
+    if (totalChar > 5000) {
+      toast.warning('Số kí tự lớn hơn 5000!', { position: 'bottom-right' })
+    }
+  }, [totalChar])
   return (
     <div id="content_wrapper" className="contai_content p-2 position-relative">
       <div className="icon_bar d-none">
         <i className="fa-solid fa-bars" style={{ fontSize: '22px' }}></i>
       </div>
       <div className="bg-light rounded-2 p-2 d-flex top_content">
-        <div>
-          <input type="file" id="fileText" className="d-none" />
-          <label
-            htmlFor="fileText"
-            className="btn btn-outline-secondary btn-lg me-4"
-          >
-            Tải file .txt
-          </label>
-        </div>
-        <div>
-          <button
-            type="button"
-            className="btn btn-outline-info btn-lg btn_use_ai"
-          >
-            Sử Dụng AI
-          </button>
-        </div>
+        <TopButtonComponent setFileContent={setText} />
       </div>
       <div className="mt-2 rounded-2 p-3 bg-light">
         <div className="border-bottom pb-2">
           <input
+            onChange={(e) => handleChangeTitle(e.target.value)}
+            value={title}
             className="px-3 py-2 w-100"
             type="text"
             id="title"
@@ -42,250 +115,45 @@ const StudioPage = () => {
           />
         </div>
         <div className="border-bottom d-flex pt-2 pb-3 px-3 edit_voices">
-          <div className="px-2 categories_voices_container">
-            <ul
-              className="categories_voices"
-              style={{ marginBottom: '0px', paddingLeft: '0px' }}
-            ></ul>
-          </div>
-          <div
-            className="px-2"
-            style={{
-              maxHeight: '25px',
-              marginLeft: '150px',
-              borderLeft: '1px solid rgb(39, 39, 39)',
-            }}
-          >
-            Âm lượng
-          </div>
-          <div
-            className="px-2"
-            style={{
-              maxHeight: '25px',
-              borderLeft: '1px solid rgb(39, 39, 39)',
-            }}
-          >
-            Tốc độ
-          </div>
+          <ListVoices checkedId={checkedId} onCheckedId={handleCheckedId} />
+          <div className="px-2 volum_speed">Âm lượng</div>
+          <div className="px-2 volum_speed">Tốc độ</div>
         </div>
         <div className="border-bottom pb-2 pt-2 text_input d-none contai_ai">
-          <div className="mb-2 d-flex justify-content-between">
-            <div className="text-info">Gửi yêu cầu cho AI</div>
-            <div className="d-flex">
-              <div className="loading loading_AI me-2 d-none">
-                <button>
-                  Đang xử lý...
-                  <svg>
-                    <rect x="1" y="1"></rect>
-                  </svg>
-                </button>
-              </div>
-              <div>
-                <button
-                  type="button"
-                  className="btn btn-outline-info"
-                  id="askAI"
-                >
-                  Gửi
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-outline-dark btn-sm hide_AI"
-                >
-                  X
-                </button>
-              </div>
-            </div>
-          </div>
-          <textarea
-            id="text-prompt"
-            className="w-100 shadow-none p-2"
-            placeholder="Nhập văn bản tại đây..."
+          <PromptAIComponent />
+          <TextForm
+            textInput=""
             rows={4}
-            style={{ outline: 'none', border: 'none' }}
-          ></textarea>
+            id="text-prompt"
+            onChange={() => console.log('')}
+          />
         </div>
         <div className="border-bottom pb-2 pt-2 text_input">
-          <textarea
-            className="w-100 shadow-none p-2"
-            id="text"
-            placeholder="Nhập văn bản tại đây..."
+          <TextForm
+            textInput={text}
             rows={13}
-            style={{ outline: 'none', border: 'none' }}
-          ></textarea>
+            id="text"
+            onChange={handleChangeText}
+          />
         </div>
         <div className="p-2">
           <span>Bôi đen để nghe thử</span>
-          <div className="d-flex justify-content-between">
-            <div>
-              <button type="button" className="btn btn-outline-secondary">
-                Nghe thử
-              </button>
-            </div>
-            <div className="d-flex align-items-center">
-              <span>0/5000</span>
-            </div>
-            <div className="d-flex">
-              <div className="loading loading_convert me-2 d-none">
-                <button>
-                  Đang xử lý...
-                  <svg>
-                    <rect x="1" y="1"></rect>
-                  </svg>
-                </button>
-              </div>
-              <div className="success_convert d-none">
-                <button type="button" className="btn btn-outline-success">
-                  Đã xong!
-                </button>
-              </div>
-              <div>
-                <button
-                  type="button"
-                  className="btn btn-info text-white"
-                  id="convert"
-                >
-                  Chuyển đổi
-                </button>
-              </div>
-            </div>
-          </div>
+          <FooterAction
+            handleSubmit={handleSubmitText}
+            totalChar={totalChar}
+            proccessing={state.proccessing}
+            converting={converting}
+          />
         </div>
       </div>
       <div className="px-2 pt-3">
         <div className="contai_audio">
-          <audio className="w-100" controls={true}>
-            <source src="#" type="audio/mp3" />
-          </audio>
+          <PlayAudio ref={audioRef} />
         </div>
       </div>
-      <div className="row gx-0 mt-3 d-flex justify-content-end filter_check">
-        <div className="col p-1">
-          <div>
-            <input type="text" placeholder="Nhập tiêu đề" />
-          </div>
-        </div>
-        <div className="col p-1">
-          <div>
-            <input type="text" placeholder="trạng thái" />
-          </div>
-        </div>
-        <div className="col p-1">
-          <div>
-            <input type="text" placeholder="Bắc đầu" />
-          </div>
-        </div>
-        <div className="col p-1">
-          <div>
-            <input type="text" placeholder="Ngày kết thúc" />
-          </div>
-        </div>
-      </div>
+      <SearchProduct />
       <div id="table_product" className="mt-3 contai_table">
-        <table>
-          <thead>
-            <tr>
-              <th className="p-2 py-3">
-                <input type="checkbox" />
-              </th>
-              <th>
-                <div className="col_title">Tiêu đề</div>
-              </th>
-              <th>
-                <div className="col_chars">Ký tự</div>
-              </th>
-              <th>
-                <div className="col_date">Thời gian</div>
-              </th>
-              <th>
-                <div className="col_status">Trạng thái</div>
-              </th>
-              <th>
-                <div className="col_voices">Giọng đọc</div>
-              </th>
-              <th>
-                <div className="col_action">Thành công</div>
-              </th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
-      {/* The Modal view detail */}
-      <div className="modal" id="myModal">
-        <div className="popup_view modal-dialog modal-xl modal-dialog-centered">
-          <div className="modal-content">
-            {/* Modal Header */}
-            <div className="modal-header contai_header position-relative">
-              <div className="close_popup">
-                <button
-                  type="button"
-                  className="btn-close shadow-none"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                ></button>
-              </div>
-            </div>
-
-            {/* Modal body */}
-            <div className="modal-body">
-              <div className="w-100 p-2 border top_popup text-center">
-                <h5 className="modal-title text-white">Thông tin</h5>
-              </div>
-              <div className="row p-2 border gx-0">
-                <div className="col">
-                  <ul>
-                    <li>
-                      <div className="d-flex">
-                        <p className="fw-bold me-3">ID:</p>
-                        <p className="view_id"></p>
-                      </div>
-                    </li>
-                    <li>
-                      <div className="d-flex">
-                        <p className="fw-bold me-3">Tiêu đề:</p>
-                        <p className="view_title"></p>
-                      </div>
-                    </li>
-                    <li>
-                      <div className="d-flex">
-                        <p className="fw-bold me-3">Số ký tự:</p>
-                        <p className="view_number_chars"></p>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-                <div className="col">
-                  <ul>
-                    <li>
-                      <div className="d-flex">
-                        <p className="fw-bold me-3">Giọng đọc: </p>
-                        <p className="view_voice_name"></p>
-                      </div>
-                    </li>
-                    <li>
-                      <div className="d-flex">
-                        <p className="fw-bold me-3">Tốc độ: </p>
-                        <p>1.0x</p>
-                      </div>
-                    </li>
-                    <li>
-                      <div className="d-flex">
-                        <p className="fw-bold me-3">Âm lượng: </p>
-                        <p>100%</p>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div className="border py-2 px-3">
-                <h6 className="fw-bold">Nội dung</h6>
-                <p className="view_content_text"></p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ListProducts products={products} handlePlayAudio={handlePlayAudio} />
       </div>
     </div>
   )

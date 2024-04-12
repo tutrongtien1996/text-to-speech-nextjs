@@ -4,7 +4,8 @@ import type { Author } from 'next/dist/lib/metadata/types/metadata-types'
 import './globals.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import LeftMenuSideBar from './components/LeftMenuSideBar'
-import NotFoundPage from './NotFoundPage'
+import Head from 'next/head'
+import { ToastContainer } from 'react-toastify'
 
 const author: Author = {
   name: 'Tien.TT',
@@ -24,8 +25,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <Head>
+        <link rel="shortcut icon" href="/favicon.ico" />
+      </Head>
       <body>
         <div className="d-flex justify-content-center vw-100  contai_body">
+          <ToastContainer />
           <LeftMenuSideBar />
           {children}
         </div>
