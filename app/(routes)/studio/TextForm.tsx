@@ -16,6 +16,7 @@ const TextForm = (props: {
         rows={props.rows}
         style={{ outline: 'none', border: 'none' }}
         onChange={(e) => props.onChange(e.target.value)}
+        value={props?.textInput}
       >
         {props?.textInput}
       </textarea>

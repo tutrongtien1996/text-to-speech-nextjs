@@ -1,19 +1,17 @@
-const TopButtonComponent = () => {
+import FileUpload from './UploadFileText'
+
+const TopButtonComponent = ({
+  setFileContent,
+}: {
+  setFileContent: (text: string) => void
+}) => {
   return (
     <>
-      <div>
-        <input type="file" id="fileText" className="d-none" />
-        <label
-          htmlFor="fileText"
-          className="btn btn-outline-secondary btn-lg me-4"
-        >
-          Tải file .txt
-        </label>
-      </div>
+      <FileUpload setFileContent={setFileContent} />
       <div>
         <button
           type="button"
-          className="btn btn-outline-info btn-lg btn_use_ai"
+          className="btn btn-outline-info btn-lg btn_use_ai disabled"
         >
           Sử Dụng AI
         </button>
