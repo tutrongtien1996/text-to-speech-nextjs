@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { findNameVoices, formatTime } from '@/controllers/helper'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -12,7 +12,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import ModalContentProduct from './ModalProduct'
 import { ResultProduct } from '@/lib/dbHelper'
-import { toast } from 'react-toastify'
 import { useStoreProduct } from '@/store/products'
 import { deleteProduct } from '@/store/products/actions'
 import { Modal, ModalBody, ModalFooter } from 'reactstrap'

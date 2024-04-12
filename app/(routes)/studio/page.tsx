@@ -100,7 +100,7 @@ const StudioPage = () => {
         <i className="fa-solid fa-bars" style={{ fontSize: '22px' }}></i>
       </div>
       <div className="bg-light rounded-2 p-2 d-flex top_content">
-        <TopButtonComponent />
+        <TopButtonComponent setFileContent={setText} />
       </div>
       <div className="mt-2 rounded-2 p-3 bg-light">
         <div className="border-bottom pb-2">
@@ -122,13 +122,19 @@ const StudioPage = () => {
         <div className="border-bottom pb-2 pt-2 text_input d-none contai_ai">
           <PromptAIComponent />
           <TextForm
+            textInput=""
             rows={4}
             id="text-prompt"
             onChange={() => console.log('')}
           />
         </div>
         <div className="border-bottom pb-2 pt-2 text_input">
-          <TextForm rows={13} id="text" onChange={handleChangeText} />
+          <TextForm
+            textInput={text}
+            rows={13}
+            id="text"
+            onChange={handleChangeText}
+          />
         </div>
         <div className="p-2">
           <span>Bôi đen để nghe thử</span>
